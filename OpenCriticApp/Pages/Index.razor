@@ -1,0 +1,53 @@
+﻿@page "/"
+@inject OpenCriticService OpenCriticAPI;
+@using OpenCriticApp.Models;
+
+@* let the user know it's loading *@
+@if (loading) {
+	<p>Fetching data... Please wait!</p>
+}
+
+else if (hofData != null) {
+	<ul>
+		@foreach (var game in hofData) {
+			<li>
+				<h3>@game.Name</h3>
+				<p>Release Date: @game.FirstReleaseDate.ToString("dd-MMM-yyyy")</p>
+				<p>Critic Score: @game.TopCriticScore</p>
+
+				@* there is sometimes no box art, crashing the web app *@
+				@if (!string.IsNullOrEmpty(game.Images?.Box?.Og)) {
+					var imageUrl = $"https://img.opencritic.com/{game.Images.Box.Og}";
+					<img src="@imageUrl" alt="@game.Name Box Art" style="max-width: 200px; height: auto;" />
+				} else {
+					<p>No image available</p>
+				}
+
+				<p>Platforms:</p>
+				<ul>
+					@foreach (var platform in game.Platforms) {
+						<li>@platform.Name</li>
+					}
+				</ul>
+			</li>
+		}
+	</ul>
+} else {
+	<p>No games available to score.</p>
+}
+
+@code {
+	private List<Game>? hofData;
+	private bool loading = true;
+	private string? error;
+
+	protected override async Task OnInitializedAsync() {
+		try {
+			hofData = await OpenCriticAPI.HallOfFame();
+		} catch (Exception e) {
+			error = "ERROR: " + e.Message;
+		} finally {
+			loading = false;
+		}
+	}
+}
