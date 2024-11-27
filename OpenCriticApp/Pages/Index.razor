@@ -1,53 +1,146 @@
 ﻿@page "/"
+
 @inject OpenCriticService OpenCriticAPI;
-@using OpenCriticApp.Models;
 
-@* let the user know it's loading *@
+@using OpenCriticApp.Models
+
+<style>
+    .card-container {
+        display: flex; 
+        flex-wrap: wrap; 
+        gap: 20px;
+        padding: 20px;
+        justify-content: flex-start;
+    }
+
+    .critic-score {
+        margin-top: auto;
+        font-weight: normal;
+        font-size: 1rem;
+        color: #666;
+    }
+
+    .critic-score .score {
+        font-weight: bold;
+        font-size: 1.2rem;
+        color: black;
+    }
+
+    .game-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 10px;
+        flex-grow: 1;
+    }
+
+    .game-card {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        max-width: 700px;
+        border: 1px solid lightgray;
+        border-radius: 8px;
+        padding: 16px;
+        background-color: white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease; /* animation */
+    }
+
+    .game-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .game-image {
+        width: 120px;
+        height: auto;
+        border-radius: 8px;
+        margin-right: 16px;
+    }
+
+    .platforms {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-left: 20px;
+    }
+
+    .platform-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-end; /* platforms are still messy */
+    }
+
+    .platform-item {
+        background-color: #f1f1f1;
+        padding: 5px 10px;
+        border-radius: 20px;
+        border: 1px solid #ccc;
+        font-size: small;
+        color: #333;
+    }
+</style>
+
+
 @if (loading) {
-	<p>Fetching data... Please wait!</p>
+    <p>Fetching data... Please wait!</p>
 }
-
 else if (hofData != null) {
-	<ul>
-		@foreach (var game in hofData) {
-			<li>
-				<h3>@game.Name</h3>
-				<p>Release Date: @game.FirstReleaseDate.ToString("dd-MMM-yyyy")</p>
-				<p>Critic Score: @game.TopCriticScore</p>
+    <div class="card-container">
+        @foreach (var game in hofData) {
+            <div class="game-card">
+                @if (!string.IsNullOrEmpty(game.Images?.Box?.Og)) {
+                    var imageUrl = $"https://img.opencritic.com/{game.Images.Box.Og}";
+                    <img src="@imageUrl" alt="@game.Name Box Art" class="game-image" />
+                }
+                else {
+                    <img src="https://via.placeholder.com/120x150" alt="@game.Name Box Art" class="game-image" />
+                }
 
-				@* there is sometimes no box art, crashing the web app *@
-				@if (!string.IsNullOrEmpty(game.Images?.Box?.Og)) {
-					var imageUrl = $"https://img.opencritic.com/{game.Images.Box.Og}";
-					<img src="@imageUrl" alt="@game.Name Box Art" style="max-width: 200px; height: auto;" />
-				} else {
-					<p>No image available</p>
-				}
+                <div class="game-info">
+                    <div class="name-release">
+                        <h3>@game.Name</h3>
+                        <span>Release Date: @game.FirstReleaseDate.ToString("dd-MMM-yyyy")</span>
+                    </div>
 
-				<p>Platforms:</p>
-				<ul>
-					@foreach (var platform in game.Platforms) {
-						<li>@platform.Name</li>
-					}
-				</ul>
-			</li>
-		}
-	</ul>
-} else {
-	<p>No games available to score.</p>
+                    <div class="critic-score">
+                        <span><strong>Critic Score:</strong> <span class="score">@game.TopCriticScore</span></span>
+                    </div>
+                </div>
+
+                <div class="platforms">
+                    <p>Platforms:</p>
+                    <div class="platform-list">
+                        @foreach (var platform in game.Platforms) {
+                            <div class="platform-item">@platform.Name</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else {
+    <p>No games available to score.</p>
 }
 
 @code {
-	private List<Game>? hofData;
-	private bool loading = true;
-	private string? error;
+    private List<Game>? hofData;
+    private bool loading = true;
+    private string? error;
 
-	protected override async Task OnInitializedAsync() {
-		try {
-			hofData = await OpenCriticAPI.HallOfFame();
-		} catch (Exception e) {
-			error = "ERROR: " + e.Message;
-		} finally {
-			loading = false;
-		}
-	}
+    protected override async Task OnInitializedAsync() {
+        try {
+            hofData = await OpenCriticAPI.HallOfFame();
+        }
+        catch (Exception e) {
+            error = "ERROR: " + e.Message;
+        }
+        finally {
+            loading = false;
+        }
+    }
 }
