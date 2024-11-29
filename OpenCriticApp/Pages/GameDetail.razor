@@ -1,0 +1,71 @@
+﻿@page "/gamedetail/{GameId:int}"
+
+@inject OpenCriticService OpenCriticService
+@using OpenCriticApp.Models;
+
+
+@if (gameDetails != null)
+{
+    <h1>@gameDetails.Name</h1>
+    <p><strong>Release Date:</strong> @gameDetails.FirstReleaseDate.ToString("dd-MMM-yyyy")</p>
+    <p><strong>Description:</strong> @gameDetails.Description</p>
+    <p><strong>Critic Score: @gameDetails.medianScore, based on @gameDetails.NumReviews reviews</strong></p>
+    <p><strong>Critics Recommended: </strong>@gameDetails.percentRecommended</p>
+
+    @if (!string.IsNullOrEmpty(gameDetails.Images?.Box?.Og)) {
+        var imageUrl = $"https://img.opencritic.com/{gameDetails.Images.Box.Og}";
+        <img src="@imageUrl" alt="@gameDetails.Name Box Art" class="game-image" />
+    } else {
+        <img src="https://via.placeholder.com/120x150" alt="@gameDetails.Name Box Art" class="game-image" />
+    }
+
+    @if (gameDetails.Trailers != null && gameDetails.Trailers.Any()) {
+        <div class="trailers">
+            @foreach (var trailer in gameDetails.Trailers) {
+                <div class="trailer">
+                    <div class="video-container">
+                        <iframe width="560" height="315" src="https://www.youtube.com/embed/@trailer.VideoId" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                </div>
+            }
+        </div>
+    } else {
+        <p>No trailers available.</p>
+    }
+
+    <p>
+        <strong>Platforms: </strong>
+        @foreach (var platform in gameDetails.Platforms) {
+            <span>@platform.Name</span>
+            @if (platform != gameDetails.Platforms.Last()) {
+                <span>, </span>
+            }
+        }
+    </p>
+
+    @if (gameDetails.Genres != null && gameDetails.Genres.Any()) {
+        <p>
+            <strong>Genres: </strong>
+            @foreach (var genre in gameDetails.Genres) {
+                <span>@genre.Name</span>
+                @if (genre != gameDetails.Genres.Last()) {
+                    <span>, </span>
+                }
+            }
+        </p>
+    } else {
+        <p>No genre information available.</p>
+    }
+
+} else {
+    <p>Loading game details...</p>
+}
+
+@code {
+    [Parameter] public int GameId { get; set; }
+    private Game gameDetails;
+
+    protected override async Task OnInitializedAsync() {
+        gameDetails = await OpenCriticService.GetGameDetailsAsync(GameId);
+    }
+}

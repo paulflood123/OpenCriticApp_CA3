@@ -16,13 +16,30 @@
 
     public class Platform {
         public string Name { get; set; } // name of console
+        public string ImageSrc { get; set; } // image for platform
+    }
+
+    public class Trailer {
+        public string Title { get; set; } // name of trailer (will be unused because looks bad)
+        public string VideoId { get; set; } // youtube vid
+        public string ExternalUrl { get; set; } // unusued i think
+    }
+
+    public class Genre {
+        public string Name { get; set; } // genre of the game
     }
 
     public class Game {
         public string Name { get; set; } // name of game
         public DateTime FirstReleaseDate { get; set; } // release date
         public float TopCriticScore { get; set; } // overall OpenCritic score
-        public Images Images { get; set; } // API uses box and banner
-        public List<Platform> Platforms { get; set; } // what console the game is on
+        public string Description { get; set; } // description of the game
+        public Images Images { get; set; } // box and banner images
+        public List<Platform> Platforms { get; set; } // platforms the game is on
+        public List<Genre> Genres { get; set; } // genres associated with the game
+        public List<Trailer> Trailers { get; set; } // trailers for the game
+        public int medianScore { get; set; }
+        public float percentRecommended { get; set; }
+        public int NumReviews { get; set; }
     }
 }
