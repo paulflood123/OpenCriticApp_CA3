@@ -4,33 +4,33 @@ using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
 public class OpenCriticService {
-        private readonly HttpClient _httpClient;
+    private readonly HttpClient _httpClient;
 
-        public OpenCriticService(HttpClient httpClient) {
-            _httpClient = httpClient;
-        }
+    public OpenCriticService(HttpClient httpClient) {
+        _httpClient = httpClient;
+    }
 
-        public async Task<List<Game>> HallOfFame() {
-            try {
-                _httpClient.DefaultRequestHeaders.Add("X-RapidAPI-Key", "140877c6c7mshe5c14876df33c62p1e8b31jsn7c2c47c1d0f6");
+    public async Task<List<Game>> HallOfFame() {
+        try {
+            _httpClient.DefaultRequestHeaders.Add("X-RapidAPI-Key", "140877c6c7mshe5c14876df33c62p1e8b31jsn7c2c47c1d0f6");
 
-                var response = await _httpClient.GetAsync("https://opencritic-api.p.rapidapi.com/game/hall-of-fame"); // current OpenCritic hall of fame
+            var response = await _httpClient.GetAsync("https://opencritic-api.p.rapidapi.com/game/hall-of-fame"); // current OpenCritic hall of fame
 
-                // logging to check if worked
-                //var responseData = await response.Content.ReadAsStringAsync();
-                //Console.WriteLine(responseData);
+            // logging to check if worked
+            //var responseData = await response.Content.ReadAsStringAsync();
+            //Console.WriteLine(responseData);
 
-                if (response.IsSuccessStatusCode) {
-                    return await response.Content.ReadFromJsonAsync<List<Game>>();
-                }
-                else {
-                    throw new Exception("ERROR: " + response.StatusCode);
-                }
+            if (response.IsSuccessStatusCode) {
+                return await response.Content.ReadFromJsonAsync<List<Game>>();
             }
-            catch (Exception e) {
-                throw new Exception(e.Message);
+            else {
+                throw new Exception("ERROR: " + response.StatusCode);
             }
         }
+        catch (Exception e) {
+            throw new Exception(e.Message);
+        }
+    }
 
     public async Task<List<SearchResult>> SearchGames(string query) {
         try {
@@ -40,7 +40,8 @@ public class OpenCriticService {
             if (response.IsSuccessStatusCode) {
                 var results = await response.Content.ReadFromJsonAsync<List<SearchResult>>();
                 return results?.Where(r => r.Relation == "game").ToList() ?? new List<SearchResult>();
-            } else {
+            }
+            else {
                 throw new Exception($"Error: {response.StatusCode}");
             }
         }
@@ -64,10 +65,9 @@ public class OpenCriticService {
             else {
                 throw new Exception($"Error: {response.StatusCode}");
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new Exception(e.Message);
         }
     }
-
 }
-

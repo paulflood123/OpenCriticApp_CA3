@@ -6,12 +6,23 @@
 
 <style>
     .card-container {
-        display: flex; 
-        flex-wrap: wrap; 
+        display: flex;
+        flex-wrap: wrap;
         gap: 20px;
         padding: 20px;
         justify-content: flex-start;
     }
+
+    a {
+        list-style-type: none;
+        text-decoration: none;
+        color: black;
+        transition: color 0.3s ease
+    }
+
+        a:hover {
+            color: #666;
+        }
 
     .critic-score {
         margin-top: auto;
@@ -20,11 +31,11 @@
         color: #666;
     }
 
-    .critic-score .score {
-        font-weight: bold;
-        font-size: 1.2rem;
-        color: black;
-    }
+        .critic-score .score {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: black;
+        }
 
     .game-info {
         display: flex;
@@ -47,16 +58,17 @@
         transition: transform 0.3s ease, box-shadow 0.3s ease; /* animation */
     }
 
-    .game-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    }
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
 
     .game-image {
         width: 120px;
         height: auto;
         border-radius: 8px;
         margin-right: 16px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease; /* animation */
     }
 
     .platforms {
@@ -93,8 +105,13 @@ else if (hofData != null) {
         @foreach (var game in hofData) {
             <div class="game-card">
                 @if (!string.IsNullOrEmpty(game.Images?.Box?.Og)) {
+                    var gamePath = game.Images.Box.Og.Split("/o/")[0];
+                    var gameName = game.Name.Replace(" ", "").ToLower();
+                    var gameUrl = $"https://opencritic.com/{gamePath}/{gameName}";
                     var imageUrl = $"https://img.opencritic.com/{game.Images.Box.Og}";
-                    <img src="@imageUrl" alt="@game.Name Box Art" class="game-image" />
+                    <a href="@gameUrl">
+                        <img src="@imageUrl" alt="@game.Name Box Art" class="game-image" />
+                    </a>
                 }
                 else {
                     <img src="https://via.placeholder.com/120x150" alt="@game.Name Box Art" class="game-image" />
@@ -102,7 +119,9 @@ else if (hofData != null) {
 
                 <div class="game-info">
                     <div class="name-release">
-                        <h3>@game.Name</h3>
+                        <a href="/gamedetail/@game.Id">
+                            <h3>@game.Name</h3>
+                        </a>
                         <span>Release Date: @game.FirstReleaseDate.ToString("dd-MMM-yyyy")</span>
                     </div>
 
@@ -112,7 +131,6 @@ else if (hofData != null) {
                 </div>
 
                 <div class="platforms">
-                    <p>Platforms:</p>
                     <div class="platform-list">
                         @foreach (var platform in game.Platforms) {
                             <div class="platform-item">@platform.Name</div>

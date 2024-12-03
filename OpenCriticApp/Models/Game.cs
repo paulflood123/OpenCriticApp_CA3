@@ -25,11 +25,17 @@
         public string ExternalUrl { get; set; } // unusued i think
     }
 
+    public class Companies {
+        public string Name { get; set; }
+        public string Type { get; set; }
+    }
+
     public class Genre {
         public string Name { get; set; } // genre of the game
     }
 
     public class Game {
+        public int Id { get; set; }
         public string Name { get; set; } // name of game
         public DateTime FirstReleaseDate { get; set; } // release date
         public float TopCriticScore { get; set; } // overall OpenCritic score
@@ -38,6 +44,7 @@
         public List<Platform> Platforms { get; set; } // platforms the game is on
         public List<Genre> Genres { get; set; } // genres associated with the game
         public List<Trailer> Trailers { get; set; } // trailers for the game
+        public List<Companies> Companies { get; set; }
         public int medianScore { get; set; }
         public float percentRecommended { get; set; }
         public int NumReviews { get; set; }

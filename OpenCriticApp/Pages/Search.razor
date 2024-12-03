@@ -44,6 +44,17 @@
         margin: 10px 0;
         font-size: 1.2rem;
     }
+
+    a {
+        list-style-type: none;
+        text-decoration: none;
+        color: black;
+        transition: color 0.3s ease
+    }
+
+    a:hover {
+        color: #666;
+    }
 </style>
 
 
@@ -58,12 +69,15 @@
 else if (searchResults?.Any() == true) {
     <div class="card-container">
         @foreach (var game in searchResults) {
+            var gameUrl = $"/gamedetail/{game.Id}";
             <div class="game-card">
                 <div class="game-info">
                     <div class="game-type-pill">
                         @game.Relation.ToUpper()
                     </div>
-                    <h3>@game.Name</h3>
+                    <a href="@gameUrl">
+                        <h3>@game.Name</h3>
+                    </a>
                 </div>
             </div>
         }

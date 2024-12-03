@@ -3,63 +3,160 @@
 @inject OpenCriticService OpenCriticService
 @using OpenCriticApp.Models;
 
-
-@if (gameDetails != null)
-{
-    <h1>@gameDetails.Name</h1>
-    <p><strong>Release Date:</strong> @gameDetails.FirstReleaseDate.ToString("dd-MMM-yyyy")</p>
-    <p><strong>Description:</strong> @gameDetails.Description</p>
-    <p><strong>Critic Score: @gameDetails.medianScore, based on @gameDetails.NumReviews reviews</strong></p>
-    <p><strong>Critics Recommended: </strong>@gameDetails.percentRecommended</p>
-
-    @if (!string.IsNullOrEmpty(gameDetails.Images?.Box?.Og)) {
-        var imageUrl = $"https://img.opencritic.com/{gameDetails.Images.Box.Og}";
-        <img src="@imageUrl" alt="@gameDetails.Name Box Art" class="game-image" />
-    } else {
-        <img src="https://via.placeholder.com/120x150" alt="@gameDetails.Name Box Art" class="game-image" />
+<style>
+    .game-details {
+        max-width: 1500px;
+        margin: 2rem auto;
+        padding: 1rem;
+        background: #fff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
     }
 
-    @if (gameDetails.Trailers != null && gameDetails.Trailers.Any()) {
-        <div class="trailers">
-            @foreach (var trailer in gameDetails.Trailers) {
-                <div class="trailer">
-                    <div class="video-container">
-                        <iframe width="560" height="315" src="https://www.youtube.com/embed/@trailer.VideoId" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                    </div>
-                </div>
-            }
-        </div>
-    } else {
-        <p>No trailers available.</p>
+    .game-title {
+        font-size: 2rem;
+        margin-bottom: 1rem;
     }
 
-    <p>
-        <strong>Platforms: </strong>
-        @foreach (var platform in gameDetails.Platforms) {
-            <span>@platform.Name</span>
-            @if (platform != gameDetails.Platforms.Last()) {
-                <span>, </span>
-            }
-        }
-    </p>
+    .game-meta p,
+    .game-additional-info p {
+        margin: 0.5rem 0;
+    }
 
-    @if (gameDetails.Genres != null && gameDetails.Genres.Any()) {
-        <p>
-            <strong>Genres: </strong>
-            @foreach (var genre in gameDetails.Genres) {
-                <span>@genre.Name</span>
-                @if (genre != gameDetails.Genres.Last()) {
-                    <span>, </span>
+    .game-meta strong,
+    .game-additional-info strong {
+        color: #555;
+    }
+
+    .platform, .genre {
+        display: inline-block;
+        background-color: #e0e0e0;
+        color: #333;
+        font-size: 0.9em;
+        font-weight: bold;
+        padding: 5px 10px;
+        border-radius: 20px;
+        margin-bottom: 5px;
+    }
+
+    .game-media {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .game-image-container {
+        flex: 1 1 200px;
+        max-width: 300px;
+    }
+
+    .game-image {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .trailers-section {
+        clear: both;
+        margin-top: 2rem;
+        width: 100%;
+    }
+
+    .trailers-container {
+        margin-top: 2rem;
+    }
+
+    .trailers {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .trailer {
+        flex: 0 1 560px;
+        max-width: 100%;
+    }
+
+</style>
+
+
+@if (gameDetails != null) {
+    <div class="game-details">
+        <h1 class="game-title">@gameDetails.Name</h1>
+        <div class="game-media">
+            <div class="game-image-container">
+                @if (!string.IsNullOrEmpty(gameDetails.Images?.Box?.Og)) {
+                    var imageUrl = $"https://img.opencritic.com/{gameDetails.Images.Banner.Og}";
+                    <img src="@imageUrl" alt="@gameDetails.Name Box Art" class="game-image" />
                 }
-            }
-        </p>
-    } else {
-        <p>No genre information available.</p>
-    }
+                else {
+                    <img src="https://via.placeholder.com/120x150" alt="@gameDetails.Name Box Art" class="game-image" />
+                }
+            </div>
 
-} else {
+            <div class="game-additional-info">
+                <p>
+                    @foreach (var company in gameDetails.Companies) {
+                        <strong class="platform">@company.Name</strong>
+                        @if (company != gameDetails.Companies.Last()) {
+                            <span>&nbsp;</span>
+                        }
+                    }
+                </p>
+                <p>
+                    @foreach (var platform in gameDetails.Platforms) {
+                        <strong class="platform">@platform.Name</strong>
+                        @if (platform != gameDetails.Platforms.Last()) {
+                            <span>&nbsp;</span>
+                        }
+                    }
+                </p>
+                @if (gameDetails.Genres != null && gameDetails.Genres.Any()) {
+                    <p>
+                        @foreach (var genre in gameDetails.Genres) {
+                            <strong class="genre">@genre.Name</strong>
+                            @if (genre != gameDetails.Genres.Last()) {
+                                <span>&nbsp;</span>
+                            }
+                        }
+                    </p>
+                }
+                else {
+                    <p>No information available.</p>
+                }
+            </div>
+
+            <div class="game-meta">
+                <p><strong>Release Date:</strong> @gameDetails.FirstReleaseDate.ToString("dd-MMM-yyyy")</p>
+                <p><strong>Description:</strong> @gameDetails.Description</p>
+                <p><strong>Critic Score:</strong> @gameDetails.medianScore, based on @gameDetails.NumReviews reviews</p>
+                <p><strong>Critics Recommended:</strong> @gameDetails.percentRecommended</p>
+            </div>
+
+            <section class="trailers-section">
+                @if (gameDetails.Trailers != null && gameDetails.Trailers.Any()) {
+                    <div class="trailers">
+                        @foreach (var trailer in gameDetails.Trailers) {
+                            <div class="trailer">
+                                <iframe width="560" height="315" src="https://www.youtube.com/embed/@trailer.VideoId" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                            </div>
+                        }
+                    </div>
+                }
+                else {
+                    <p>No trailers available.</p>
+                }
+            </section>
+        </div>
+    </div>
+}
+else {
     <p>Loading game details...</p>
 }
+
 
 @code {
     [Parameter] public int GameId { get; set; }
