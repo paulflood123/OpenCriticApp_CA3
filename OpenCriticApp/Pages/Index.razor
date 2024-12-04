@@ -94,17 +94,100 @@
         font-size: small;
         color: #333;
     }
+
+    .search-bar {
+        width: 100%;
+        max-width: 400px;
+        padding: 12px 20px; 
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .search-bar:focus {
+        border-color: #007BFF;
+        outline: none;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+
+    .autocomplete-dropdown {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        background-color: white;
+        width: 100%;
+        max-width: 400px;
+        z-index: 1000;
+    }
+
+    .autocomplete-item {
+        list-style-type: none;
+        padding: 8px 12px;
+        cursor: pointer;
+        background-color: white;
+    }
+
+    .pagination-controls {
+        display: flex;
+        gap: 5px;
+        justify-content: center;
+        align-items: center;
+        margin-right: 5px;
+        margin-top: 20px;
+        margin-bottom: 1em;
+    }
+
+    .pagination-controls button {
+        background-color: #f1f1f1;
+        padding: 5px 10px;
+        border-radius: 20px;
+        border: 1px solid #ccc;
+        font-size: small;
+        color: #333;
+    }
+
+    .pagination-controls button:hover {
+        background-color: #666;
+        color: white;
+    }
+
+    .pagination-controls button:disabled {
+        background-color: #111;
+        color: white;
+        opacity: 30%;
+    }
 </style>
 
 
-@if (loading) {
+@if (loading)
+{
     <p>Fetching data... Please wait!</p>
 }
-else if (hofData != null) {
+else if (pagedData != null && pagedData.Any())
+{
+    <div class="search-container">
+        <input class="search-bar"
+               type="text"
+               @oninput="OnSearchChanged"
+               value="@searchTerm"
+               placeholder="Search for a game..." />
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(searchTerm) && filteredData.Any())
+    {
+        <ul class="autocomplete-dropdown">
+            @foreach (var game in filteredData)
+            {
+                <li class="autocomplete-item" @onclick="() => SelectGame(game.Name)">@game.Name</li>
+            }
+        </ul>
+    }
+
     <div class="card-container">
-        @foreach (var game in hofData) {
+        @foreach (var game in pagedData)
+        {
             <div class="game-card">
-                @if (!string.IsNullOrEmpty(game.Images?.Box?.Og)) {
+                @if (!string.IsNullOrEmpty(game.Images?.Box?.Og))
+                {
                     var gamePath = game.Images.Box.Og.Split("/o/")[0];
                     var gameName = game.Name.Replace(" ", "").ToLower();
                     var gameUrl = $"https://opencritic.com/{gamePath}/{gameName}";
@@ -113,7 +196,8 @@ else if (hofData != null) {
                         <img src="@imageUrl" alt="@game.Name Box Art" class="game-image" />
                     </a>
                 }
-                else {
+                else
+                {
                     <img src="https://via.placeholder.com/120x150" alt="@game.Name Box Art" class="game-image" />
                 }
 
@@ -132,7 +216,8 @@ else if (hofData != null) {
 
                 <div class="platforms">
                     <div class="platform-list">
-                        @foreach (var platform in game.Platforms) {
+                        @foreach (var platform in game.Platforms)
+                        {
                             <div class="platform-item">@platform.Name</div>
                         }
                     </div>
@@ -140,25 +225,82 @@ else if (hofData != null) {
             </div>
         }
     </div>
+    <div class="pagination-controls">
+        <button @onclick="PreviousPage" disabled="@(currentPage == 1)">Previous</button>
+        <span>Page @currentPage of @totalPages</span>
+        <button @onclick="NextPage" disabled="@(currentPage == totalPages)">Next</button>
+    </div>
 }
-else {
+else
+{
     <p>No games available to score.</p>
 }
 
 @code {
     private List<Game>? hofData;
+    private List<Game>? filteredData;
+    private List<Game> pagedData;
     private bool loading = true;
+    private int currentPage;
+    private const int pageSize = 3;
+    private string searchTerm = string.Empty;
     private string? error;
 
     protected override async Task OnInitializedAsync() {
         try {
             hofData = await OpenCriticAPI.HallOfFame();
-        }
-        catch (Exception e) {
+            filteredData = hofData;
+            currentPage = 1;
+            UpdatePagedData();
+        } catch (Exception e) {
             error = "ERROR: " + e.Message;
-        }
-        finally {
+        } finally {
             loading = false;
+        }
+    }
+
+    // amount of pages to find given the data
+    private int totalPages => (int)Math.Ceiling((double)(filteredData?.Count ?? 0) / pageSize);
+
+    private void OnSearchChanged(ChangeEventArgs e) {
+        searchTerm = e.Value?.ToString() ?? string.Empty;
+        currentPage = 1;
+
+        // no filter
+        if (string.IsNullOrWhiteSpace(searchTerm)) {
+            filteredData = hofData;
+        }
+        else {
+            filteredData = hofData.Where(game => game.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
+
+        UpdatePagedData();
+    }
+
+    private void SelectGame(string game) {
+        searchTerm = game;
+        filteredData = hofData.Where(x => x.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
+        currentPage = 1;
+        UpdatePagedData();
+    }
+
+    private void UpdatePagedData() {
+        if (filteredData != null) {
+            pagedData = filteredData.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+        }
+    }
+
+    private void NextPage() {
+        if (currentPage < totalPages) {
+            currentPage++;
+            UpdatePagedData();
+        }
+    }
+
+    private void PreviousPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            UpdatePagedData();
         }
     }
 }
