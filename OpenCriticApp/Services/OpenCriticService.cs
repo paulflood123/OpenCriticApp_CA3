@@ -70,4 +70,23 @@ public class OpenCriticService {
             throw new Exception(e.Message);
         }
     }
+
+    public async Task<List<Game>> HallOfFameByYear(int year) {
+
+        try {
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Add("X-RapidAPI-Key", "140877c6c7mshe5c14876df33c62p1e8b31jsn7c2c47c1d0f6");
+            _httpClient.DefaultRequestHeaders.Add("X-RapidAPI-Host", "opencritic-api.p.rapidapi.com");
+            var response = await _httpClient.GetAsync($"https://opencritic-api.p.rapidapi.com/game/hall-of-fame/{year}");
+
+            if (response.IsSuccessStatusCode) {
+                return await response.Content.ReadFromJsonAsync<List<Game>>();
+            } else {
+                throw new Exception($"Error: {response.StatusCode}");
+            }
+        } catch (Exception e) {
+            throw new Exception(e.Message);
+        }
+    }
+
 }

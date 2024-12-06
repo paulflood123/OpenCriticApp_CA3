@@ -58,7 +58,7 @@
         transition: transform 0.3s ease, box-shadow 0.3s ease; /* animation */
     }
 
-        .game-card:hover {
+    .game-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
@@ -95,6 +95,12 @@
         color: #333;
     }
 
+    .search-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
     .search-bar {
         width: 100%;
         max-width: 400px;
@@ -112,11 +118,11 @@
     }
 
     .autocomplete-dropdown {
+        margin: auto;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         background-color: white;
         width: 100%;
         max-width: 400px;
-        z-index: 1000;
     }
 
     .autocomplete-item {
@@ -124,6 +130,14 @@
         padding: 8px 12px;
         cursor: pointer;
         background-color: white;
+    }
+
+    .autocomplete-item:hover {
+        background-color: whitesmoke;
+    }
+
+    .autocomplete-item:active {
+        background-color: darkgray;
     }
 
     .pagination-controls {
@@ -157,20 +171,17 @@
     }
 </style>
 
+<h1 class="text-center">Current Trending Games on OpenCritic</h1>
+<div class="search-container">
+    <input class="search-bar" type="text" @oninput="OnSearchChanged" value="@searchTerm" placeholder="Search for a game..." />
+</div>
 
 @if (loading)
 {
     <p>Fetching data... Please wait!</p>
 }
-else if (pagedData != null && pagedData.Any())
-{
-    <div class="search-container">
-        <input class="search-bar"
-               type="text"
-               @oninput="OnSearchChanged"
-               value="@searchTerm"
-               placeholder="Search for a game..." />
-    </div>
+
+else if (pagedData != null && pagedData.Any()) {
 
     @if (!string.IsNullOrWhiteSpace(searchTerm) && filteredData.Any())
     {
@@ -242,7 +253,7 @@ else
     private List<Game> pagedData;
     private bool loading = true;
     private int currentPage;
-    private const int pageSize = 3;
+    private const int pageSize = 4;
     private string searchTerm = string.Empty;
     private string? error;
 
