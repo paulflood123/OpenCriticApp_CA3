@@ -84,6 +84,38 @@ namespace OpenCriticApp_Test {
             Assert.AreEqual("Astro Bot", gameName);
         }
 
+        [TestMethod]
+        public void TestHallOfFame() { // automation will assert should be 2018 game of the year, red dead redemption 2 (96 critic score)
+            driver.Navigate().GoToUrl("http://localhost:5198");
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            Thread.Sleep(5000);
+
+            var hofLink = driver.FindElement(By.CssSelector("a[href*='/halloffame']"));
+            hofLink.Click();
+            Thread.Sleep(2000);
+
+            var yearButton = driver.FindElement(By.Id("year"));
+            yearButton.Click();
+            Thread.Sleep(2000);
+
+            var selectedYear = driver.FindElement(By.CssSelector("option[value = '2018']"));
+            selectedYear.Click();
+            Thread.Sleep(2000);
+
+            var searchButton = driver.FindElement(By.Id("year-button"));
+            searchButton.Click();
+            Thread.Sleep(2000);
+
+            var games = driver.FindElements(By.CssSelector(".game-card"));
+            var gameName = games[0].FindElement(By.CssSelector(".game-info h3")).Text;
+            var releaseDate = games[0].FindElement(By.CssSelector(".game-info span")).Text;
+            var criticScore = games[0].FindElement(By.CssSelector(".score")).Text;
+
+            Assert.AreEqual(gameName, "Red Dead Redemption 2");
+            Assert.AreEqual(releaseDate, "Release Date: 26-Oct-2018");
+            Assert.AreEqual(criticScore, "96"); // score is not an int for the hall of fame
+        }
+
         [TestCleanup]
         public void TearDown() {
             driver.Quit();
