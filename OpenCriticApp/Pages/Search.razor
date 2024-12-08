@@ -61,7 +61,7 @@
 <h1>Search Games</h1>
 
 <input @bind="searchQuery" placeholder="Search for games..." />
-<button @onclick="PerformSearch">Search</button>
+<button @onclick="PerformSearch" name="search">Search</button>
 
 @if (loading) {
     <p>Loading...</p>
