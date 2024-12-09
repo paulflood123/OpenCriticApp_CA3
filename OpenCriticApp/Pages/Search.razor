@@ -40,6 +40,52 @@
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     }
 
+    .search-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .search-bar {
+        width: 100%;
+        max-width: 400px;
+        padding: 12px 20px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .search-bar:focus {
+        border-color: #007BFF;
+        outline: none;
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+    }
+
+    #search-button {
+        padding: 12px 16px;
+        border-radius: 0.4em;
+        margin-left: 5px;
+        font-size: 16px;
+        background-color: lightgray;
+        color: #666;
+        border: none;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    #search-button:hover {
+        background-color: darkgray;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    #search-button:active {
+        background-color: gray;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transform: scale(0.98);
+    }
+
     .game-info h3 {
         margin: 10px 0;
         font-size: 1.2rem;
@@ -55,13 +101,25 @@
     a:hover {
         color: #666;
     }
+
+    .alert {
+        max-width: 400px;
+        max-height: 60px;
+        justify-content: center;
+        display: block;
+        margin-top: 20px !important;
+        margin: auto !important;
+        text-align: center;
+    }
 </style>
 
 
-<h1>Search Games</h1>
+<h1 class="text-center">Search Games</h1>
 
-<input @bind="searchQuery" placeholder="Search for games..." />
-<button @onclick="PerformSearch" name="search">Search</button>
+<div class="search-container">
+	<input class="search-bar" @bind="searchQuery" placeholder="Search for games..." />
+    <button id="search-button" @onclick="PerformSearch"><i class="oi oi-magnifying-glass"></i></button>
+</div>
 
 @if (loading) {
     <p>Loading...</p>
@@ -84,9 +142,16 @@ else if (searchResults?.Any() == true) {
     </div>
 
 } else if (!string.IsNullOrEmpty(error)) {
+    <div class="alert alert-danger" role="alert">
     <p class="error">@error</p>
+    </div>
+}
+else if (!string.IsNullOrEmpty(searchQuery)) {
+    <div class="alert alert-danger" role="alert">
+        <p>No results found.</p>
+    </div>
 } else {
-    <p>No results found.</p>
+    <p class="text-muted text-center">Use the field above to search for games on OpenCritic</p>
 }
 
 @code {

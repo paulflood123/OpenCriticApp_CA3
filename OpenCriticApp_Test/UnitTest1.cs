@@ -29,6 +29,28 @@ namespace OpenCriticApp_Test {
         }
 
         [TestMethod]
+        public void TestNavigationSearch() { // test to see if search tab works
+            driver.Navigate().GoToUrl("http://localhost:5198");
+            Thread.Sleep(5000);
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+
+            var gameLink = driver.FindElement(By.CssSelector("a[href*='/search']"));
+            gameLink.Click();
+            Assert.IsTrue(driver.Url.Contains("/search"));
+        }
+
+        [TestMethod]
+        public void TestNavigationHallOfFame() {
+            driver.Navigate().GoToUrl("http://localhost:5198");
+            Thread.Sleep(5000);
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+
+            var gameLink = driver.FindElement(By.CssSelector("a[href*='/halloffame']"));
+            gameLink.Click();
+            Assert.IsTrue(driver.Url.Contains("/halloffame"));
+        }
+
+        [TestMethod]
         public void TestGameDetail() { // astro bot
             driver.Navigate().GoToUrl("http://localhost:5198");
             Thread.Sleep(5000);

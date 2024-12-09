@@ -130,10 +130,10 @@
             </div>
 
             <div class="game-meta">
-                <p><strong>Release Date:</strong> @gameDetails.FirstReleaseDate.ToString("dd-MMM-yyyy")</p>
+                <p><strong>Release Date:</strong> @gameDetails.FirstReleaseDate.ToString("MMMM dd, yyyy")</p>
                 <p><strong>Description:</strong> @gameDetails.Description</p>
                 <p><strong>Critic Score:</strong> @gameDetails.medianScore, based on @gameDetails.NumReviews reviews</p>
-                <p><strong>Critics Recommended:</strong> @gameDetails.percentRecommended</p>
+                <p><strong>Critics Recommended:</strong> @Math.Round(@gameDetails.percentRecommended, 2)%</p>
             </div>
 
             <section class="trailers-section">
