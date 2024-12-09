@@ -5,6 +5,17 @@
 @using OpenCriticApp.Models
 
 <style>
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
     .card-container {
         display: flex;
         flex-wrap: wrap;
@@ -56,6 +67,7 @@
         background-color: white;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease, box-shadow 0.3s ease; /* animation */
+        animation: fadeIn 0.8s ease forwards;
     }
 
     .game-card:hover {
@@ -99,6 +111,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        margin-bottom: 15px;
     }
 
     .search-bar {
@@ -169,15 +182,26 @@
         color: white;
         opacity: 30%;
     }
+
+    .alert {
+        max-width: 400px;
+        max-height: 60px;
+        justify-content: center;
+        display: block;
+        margin-top: 20px !important;
+        margin: auto !important;
+        text-align: center;
+    }
 </style>
 
 <h1 class="text-center">Current Trending Games on OpenCritic</h1>
 <div class="search-container">
     <input class="search-bar" type="text" @oninput="OnSearchChanged" value="@searchTerm" placeholder="Search for a game..." />
 </div>
-@if (loading)
-{
-    <p>Fetching data... Please wait!</p>
+@if (loading) {
+    <div class="alert alert-secondary" role="alert">
+        <p>Please wait!</p>
+    </div>
 }
 
 else if (pagedData != null && pagedData.Any()) {
@@ -195,7 +219,7 @@ else if (pagedData != null && pagedData.Any()) {
     <div class="card-container">
         @foreach (var game in pagedData)
         {
-            <div class="game-card">
+            <div class="game-card game-card.animation">
                 @if (!string.IsNullOrEmpty(game.Images?.Box?.Og))
                 {
                     var gamePath = game.Images.Box.Og.Split("/o/")[0];
@@ -236,14 +260,15 @@ else if (pagedData != null && pagedData.Any()) {
         }
     </div>
     <div class="pagination-controls">
-        <button @onclick="PreviousPage" disabled="@(currentPage == 1)">Previous</button>
+        <button id="prev-page" @onclick="PreviousPage" disabled="@(currentPage == 1)">Previous</button>
         <span>Page @currentPage of @totalPages</span>
-        <button @onclick="NextPage" disabled="@(currentPage == totalPages)">Next</button>
+        <button id="next-page" @onclick="NextPage" disabled="@(currentPage == totalPages)">Next</button>
     </div>
 }
-else
-{
-    <p>No games available to score.</p>
+else {
+    <div class="alert alert-secondary" role="alert">
+        <p>No games available, given your criteria.</p>
+    </div>
 }
 
 @code {

@@ -138,6 +138,33 @@ namespace OpenCriticApp_Test {
             Assert.AreEqual(criticScore, "96"); // score is not an int for the hall of fame
         }
 
+        [TestMethod]
+        public void TestPaginatorFunction() {
+            driver.Manage().Window.Size = new System.Drawing.Size(1920, 1080); // putting this as the resolution of my monitor. having it the default size doesn't work because it can't see it by default. 
+            driver.Navigate().GoToUrl("http://localhost:5198");
+            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            Thread.Sleep(5000);
+
+            var previousButton = driver.FindElement(By.Id("prev-page"));
+            var nextButton = driver.FindElement(By.Id("next-page"));
+            var currentPage = driver.FindElement(By.CssSelector(".pagination-controls span"));
+
+            var firstPage = currentPage.Text;
+            Assert.IsTrue(firstPage.Contains("Page 1"));
+
+            nextButton.Click();
+            Thread.Sleep(2000);
+
+            var secondPage = currentPage.Text;
+            Assert.IsTrue(secondPage.Contains("Page 2"));
+
+            nextButton.Click();
+            Thread.Sleep(2000);
+
+            var thirdPage = currentPage.Text;
+            Assert.IsTrue(thirdPage.Contains("Page 3"));
+        }
+
         [TestCleanup]
         public void TearDown() {
             driver.Quit();
