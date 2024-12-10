@@ -21,7 +21,7 @@
         flex-wrap: wrap;
         gap: 20px;
         padding: 20px;
-        justify-content: flex-start;
+        justify-content: center;
     }
 
     a {
@@ -192,6 +192,49 @@
         margin: auto !important;
         text-align: center;
     }
+
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-toggle {
+        background-color: #f1f1f1;
+        border: 1px solid #ccc;
+        padding: 5px;
+        cursor: pointer;
+        border-radius: 20px;
+        font-size: small;
+    }
+
+        .dropdown-toggle:hover {
+            border-color: darkgrey;
+        }
+
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        min-width: 100px;
+        background-color: white;
+        box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+        z-index: 1;
+    }
+
+    .dropdown:active .dropdown-menu {
+        display: block;
+    }
+
+    .dropdown-item {
+        padding: 3px;
+        text-decoration: none;
+        display: block;
+        color: black;
+        font-size: 12px;
+    }
+
+        .dropdown-item:hover {
+            background-color: white;
+        }
 </style>
 
 <h1 class="text-center">Current Trending Games on OpenCritic</h1>
@@ -249,11 +292,20 @@ else if (pagedData != null && pagedData.Any()) {
                 </div>
 
                 <div class="platforms">
-                    <div class="platform-list">
-                        @foreach (var platform in game.Platforms)
-                        {
+                    <div class="platform-list d-none d-md-flex">
+                        @foreach (var platform in game.Platforms) {
                             <div class="platform-item">@platform.Name</div>
                         }
+                    </div>
+                    <div class="dropdown d-block d-md-none">
+                        <button class="btn btn-light dropdown-toggle" type="button" id="platformDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            Platforms
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="platformDropdown">
+                            @foreach (var platform in game.Platforms) {
+                                <li><a class="dropdown-item">@platform.Name</a></li>
+                            }
+                        </ul>
                     </div>
                 </div>
             </div>
